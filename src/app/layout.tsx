@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "Velton Derby Party — Live Odds",
-  description: "Live Kentucky Derby win-pool odds dashboard.",
+  metadataBase: new URL(SITE_URL),
+  title: "Velton's Kentucky Derby Party",
+  description: "Live odds dashboard for the Kentucky Derby. Informational only.",
   applicationName: "Derby Party",
   appleWebApp: {
     capable: true,
@@ -12,6 +15,28 @@ export const metadata: Metadata = {
   },
   formatDetection: {
     telephone: false,
+  },
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noarchive: true,
+      nosnippet: true,
+    },
+  },
+  openGraph: {
+    title: "Velton's Kentucky Derby Party",
+    description: "Live odds for the Kentucky Derby. Informational only.",
+    siteName: "Velton's Kentucky Derby Party",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Velton's Kentucky Derby Party",
+    description: "Live odds for the Kentucky Derby. Informational only.",
   },
 };
 
