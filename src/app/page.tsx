@@ -10,7 +10,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="h-full w-full px-4 py-3 sm:px-6 sm:py-4 flex flex-col">
+    <main className="h-full w-full flex flex-col">
       <OddsBoard initial={initial} />
     </main>
   );

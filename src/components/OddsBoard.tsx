@@ -264,7 +264,7 @@ function Grid({ horses, live, gate }: { horses: Horse[]; live: boolean; gate: Se
 }
 
 const ROW_GRID =
-  "grid grid-cols-[2.25rem_1fr_2.75rem_2.75rem_2.5rem_3rem] sm:grid-cols-[2.25rem_1fr_3rem_3rem_2.75rem_3.25rem] items-center gap-2 px-3";
+  "grid grid-cols-[2.25rem_1fr_6rem] items-center gap-3 px-3";
 
 function Column({
   horses,
@@ -282,10 +282,7 @@ function Column({
       >
         <span>#</span>
         <span>Horse</span>
-        <span className="text-right" title="TwinSpires morning line">TS</span>
-        <span className="text-right" title="HorseRacingNation morning line">HRN</span>
-        <span className="text-right" title="HRN composite rating">Rtg</span>
-        <span className="text-right">{live ? "Live" : "Near"}</span>
+        <span className="text-right">Odds</span>
       </div>
       <div className="flex-1 min-h-0 flex flex-col">
         {horses.map((h, i) => (
@@ -303,7 +300,6 @@ function Row({ horse, inGate }: { horse: Horse; inGate: boolean }) {
     : standby
       ? "opacity-60"
       : "";
-  const divergent = oddsDiverge(horse.morningLine, horse.hrnML);
 
   return (
     <div
@@ -337,52 +333,15 @@ function Row({ horse, inGate }: { horse: Horse; inGate: boolean }) {
           </div>
         )}
       </div>
-      <span className="text-right text-derby-cream/55 font-mono tabular-nums text-xs">
-        {horse.morningLine || "—"}
-      </span>
       <span
-        className={`text-right font-mono tabular-nums text-xs ${
-          divergent ? "text-amber-300" : "text-derby-cream/55"
-        }`}
-        title={divergent ? "Diverges from TwinSpires ML" : undefined}
-      >
-        {horse.hrnML || "—"}
-      </span>
-      <span className="text-right font-mono tabular-nums text-xs text-derby-cream/45">
-        {formatRating(horse.hrnRating)}
-      </span>
-      <span
-        className={`text-right font-mono font-semibold tabular-nums ${
+        className={`text-right font-mono font-semibold tabular-nums text-xl leading-none ${
           standby ? "text-derby-cream/55" : "text-derby-rose"
         }`}
       >
-        {horse.liveOdds || "—"}
+        {horse.scratched ? "SCR" : horse.liveOdds || "—"}
       </span>
     </div>
   );
-}
-
-function formatRating(rating?: number): string {
-  if (rating == null || !Number.isFinite(rating)) return "—";
-  return rating.toFixed(2);
-}
-
-function oddsToDecimal(odds?: string): number | null {
-  if (!odds) return null;
-  const m = odds.match(/^(\d+)\s*[/-]\s*(\d+)$/);
-  if (!m) return null;
-  const num = parseInt(m[1], 10);
-  const den = parseInt(m[2], 10) || 1;
-  return num / den;
-}
-
-function oddsDiverge(a?: string, b?: string): boolean {
-  const da = oddsToDecimal(a);
-  const db = oddsToDecimal(b);
-  if (da == null || db == null) return false;
-  if (Math.max(da, db) < 1) return false;
-  // Flag when prices differ by ≥40% — small ML differences are noise.
-  return Math.abs(da - db) / Math.max(da, db) >= 0.4;
 }
 
 function StatusDot({ status }: { status: Status }) {

@@ -57,17 +57,28 @@ async function applyOverlays(base: OddsSnapshot): Promise<OddsSnapshot> {
   if (process.env.ODDS_OVERLAY_HRN !== "false") {
     try {
       const hrn = await fetchHrnEntries();
+      // Only trust HRN's "missing horse → scratched" signal if HRN itself
+      // returned a healthy roster. Guards against a parser/upstream blip
+      // marking the entire field as scratched.
+      const hrnHealthy = hrn.size >= 15;
       horses = horses.map((h) => {
         const e = hrn.get(h.program);
-        if (!e) return h;
-        return {
-          ...h,
-          hrnML: e.ml,
-          hrnRating: e.rating,
-          hrnFlaggedScratch: e.flaggedScratch,
-          trainer: h.trainer ?? e.trainer,
-          jockey: h.jockey ?? e.jockey,
-        };
+        if (e) {
+          const scratched = h.scratched || !!e.flaggedScratch;
+          return {
+            ...h,
+            hrnML: e.ml,
+            hrnRating: e.rating,
+            hrnFlaggedScratch: e.flaggedScratch,
+            trainer: h.trainer ?? e.trainer,
+            jockey: h.jockey ?? e.jockey,
+            scratched,
+          };
+        }
+        if (hrnHealthy) {
+          return { ...h, scratched: true, hrnFlaggedScratch: true };
+        }
+        return h;
       });
       sources.push("hrn");
     } catch (err) {
